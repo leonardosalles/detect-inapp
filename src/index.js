@@ -16,7 +16,7 @@ class App extends Component {
   state = {
     inapp: null,
     value: '',
-    uri: 'twitter://',
+    uri: '',
   }
 
   componentWillMount() {
@@ -24,8 +24,16 @@ class App extends Component {
     const inapp = new InApp(useragent);
     const value = [`${useragent}`];
     if (navigator) for (let key in navigator) value.push(`${key}=${navigator[key]}`); // eslint-disable-line
-    this.setState({ inapp, value: value.join('\n') });
-    window.ga('send', 'event', 'useragent', useragent, inapp.browser);
+
+    // https://apps.apple.com/app/id1161108457
+    let location = "https://ziplet.app.link/"//"itms-appss://apps.apple.com/app/id1161108457";
+
+    const isAndroid = useragent.indexOf("android") > -1;
+    if (isAndroid) {
+      location = "intent://open?link_click_id=1069825942863582451";
+    }
+
+    this.setState({ inapp, value: value.join('\n'), uri: location });
   }
 
   componentDidMount() {
@@ -35,9 +43,8 @@ class App extends Component {
   onUriChange = e => this.setState({ uri: e.target.value });
 
   onOpenClick = async () => {
-    const { inapp, uri } = this.state;
-    const reply = await inapp.open({ ios: { uri } });
-    if (!reply) alert('Cannot Open'); // eslint-disable-line
+    const { uri } = this.state;
+    window.open(uri, '_system', 'location=no');
   }
 
   render() {
@@ -82,7 +89,7 @@ class App extends Component {
             <div className="input-group">
               <input className="form-control" type="text" defaultValue={uri} onChange={this.onUriChange} />
               <span className="input-group-button">
-                <button className="btn" onClick={this.onOpenClick}>
+                <button className="btn" onClick={this.onOpenClick} id="btn-send">
                   <DiffRenamed />
                 </button>
               </span>
@@ -99,6 +106,12 @@ class App extends Component {
             <a className="github-button" href="https://github.com/f2etw/detect-inapp/issues" data-size="large" data-show-count="true" data-icon="octicon-issue-opened" aria-label="Issue f2etw/detect-inapp on GitHub">Issue</a>&nbsp;
             <a className="github-button" href="https://github.com/f2etw/detect-inapp/fork" data-size="large" data-show-count="true" data-icon="octicon-repo-forked" aria-label="Fork f2etw/detect-inapp on GitHub">Fork</a>&nbsp;
             <a className="github-button" href="https://github.com/f2etw/detect-inapp" data-size="large" data-show-count="true" data-icon="octicon-star" aria-label="Star f2etw/detect-inapp on GitHub">Star</a>
+
+
+
+            <a href="itms-appss://apps.apple.com/app/id1161108457">Test</a>
+            <a href="https://play.google.com/store/apps/details?id=com.loop.loopfeedback">Test 2</a>
+            <a href="https://play.app.goo.gl/?link=https://play.google.com/store/apps/details?id=com.loop.loopfeedback">Test 3</a>
           </div>
         </div>
       </div>
